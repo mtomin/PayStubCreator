@@ -144,7 +144,7 @@ namespace Methods
     }
     public class Writers
     {
-        public static void ExportToPDF(Company company, Employee employee, string outputFilePath)
+        public static void ExportToPDF(Company company, Employee employee, string companyLogoPath, string outputFilePath)
         {
             //Page formatting constants
             const int HEADER_WIDTH = 250;
@@ -167,9 +167,14 @@ namespace Methods
             tf.Alignment = XParagraphAlignment.Right;
             currentHeight += HEADER_HEIGHT;
             tf.DrawString(employee.AddressHeader(), headerFont, XBrushes.Black, new XRect(pdfPage.Width - HEADER_WIDTH - LEFT_MARGIN, currentHeight, HEADER_WIDTH, HEADER_HEIGHT), XStringFormats.TopLeft);
-            string companyLogoPath = @"C:\Users\Menta\Desktop\mfclogo.png";
-            XImage companyLogo = XImage.FromFile(companyLogoPath);
-            graph.DrawImage(companyLogo, LEFT_MARGIN, currentHeight - 30, HEADER_WIDTH, HEADER_HEIGHT);
+            
+            //Draw logo image if filename provided
+            if (System.IO.File.Exists(companyLogoPath))
+            {
+                XImage companyLogo = XImage.FromFile(companyLogoPath);
+                graph.DrawImage(companyLogo, LEFT_MARGIN, currentHeight - 30, HEADER_WIDTH, HEADER_HEIGHT);
+            }
+
 
             //Body section
 

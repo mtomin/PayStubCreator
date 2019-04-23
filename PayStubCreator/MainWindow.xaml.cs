@@ -20,13 +20,15 @@ namespace PayStubCreator
         public MainWindow()
         {
             InitializeComponent();
-            
         }
 
         private void FileAddButton_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog fileDialog = new OpenFileDialog();
-            fileDialog.Filter = "Excel 97-2003 files(*.xls)|*.xls|Excel 2016 files(*.xlsx)|*.xlsx";
+            //Get the filename from the file browser dialog
+            OpenFileDialog fileDialog = new OpenFileDialog
+            {
+                Filter = "Excel 97-2003 files(*.xls)|*.xls|Excel 2016 files(*.xlsx)|*.xlsx"
+            };
 
             if (fileDialog.ShowDialog().Value)
             {
@@ -49,6 +51,7 @@ namespace PayStubCreator
 
         private void FolderAddButton_Click(object sender, RoutedEventArgs e)
         {
+            //Get the directory name from the folder browser dialog
             string[] acceptableExtensions = { ".xls", ".xlsx" };
             WinForms.FolderBrowserDialog folderDialog = new WinForms.FolderBrowserDialog();
 
@@ -62,6 +65,7 @@ namespace PayStubCreator
                 {
                     CreatePayStubFromFile(fileName);
                 }
+
                 if (numberOfErrors == 0)
                 {
                     string message = String.Format("All {0} pay stubs were successfully created", numberOfSuccessful);
@@ -85,7 +89,6 @@ namespace PayStubCreator
         {
             Company company = new Company();
             Employee employee = new Employee();
-            MessageBox.Show(fileName);
 
             using (ExcelPackage xlPackage = new ExcelPackage(new FileInfo(fileName)))
             {
@@ -100,7 +103,7 @@ namespace PayStubCreator
 
                 //Create a lambda adapter to pass filename and logfilename to LogError
                 //LogErrorAdapter was created because it is not possible to unsubscribe the lambda function
-                EventHandler<EventData> LogErrorAdapter = (sender, eventData) => LogError(sender, eventData, fileName, logfileName);
+                void LogErrorAdapter(object sender, EventData eventData) => LogError(eventData, fileName, logfileName);
                 Readers.ErrorOccured += LogErrorAdapter;
                 Readers.ReadCompanyData(company, worksheet);
                 
@@ -114,8 +117,9 @@ namespace PayStubCreator
                 }
                 if (!errorHappened)
                 {
-                    string outputFilePath = System.IO.Path.ChangeExtension(fileName, ".pdf");
-                    Writers.ExportToPDF(company, employee, outputFilePath);
+                    string outputFilePath = Path.ChangeExtension(fileName, ".pdf");
+                    string logoFilename = logoLBL.Text;
+                    Writers.ExportToPDF(company, employee, logoFilename, outputFilePath);
                 }
 
                 if (!errorHappened)
@@ -126,9 +130,11 @@ namespace PayStubCreator
             }
         }
 
-        private void LogError(object sender, EventData eventData, string fileName, string logfileName)
+        private void LogError(EventData eventData, string fileName, string logfileName)
         {
+            //Add filename to description
             eventData.ErrorDescription += string.Format(" {0}. The pay stub for that file was not generated.", fileName);
+
             using (FileStream fs = File.Open(logfileName, FileMode.Append, FileAccess.Write))
             {
                 using (StreamWriter sw = new StreamWriter(fs))
@@ -138,6 +144,19 @@ namespace PayStubCreator
             }
             errorHappened = true;
             numberOfErrors++;
+        }
+
+        private void AddLogoBtn_Click(object sender, RoutedEventArgs e)
+        {
+            //Get the logo filename from the file browser dialog
+            OpenFileDialog fileDialog = new OpenFileDialog
+            {
+                Filter = "All files(*.*)|*.*"
+            };
+            if (fileDialog.ShowDialog().Value)
+            {
+                logoLBL.Text = (fileDialog.FileName);
+            }
         }
     }
 }
