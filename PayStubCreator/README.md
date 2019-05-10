@@ -11,6 +11,7 @@ The application has rudimentary logging built-in, which reports files where erro
 
 ## Output
 Sample output pdf:
+
 ![Output pdf](https://i.imgur.com/KyNvZDV.png)
 
 ### Dependencies
