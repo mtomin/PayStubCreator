@@ -6,6 +6,7 @@ The aim was to parse employee working hours in a set excel format (excel templat
 ## User interface
 
 The user interface is created in WPF. It allows for the excel file selection, batch mode where all .xls and .xlsx files are parsed and optional company logo image selection.
+
 ![alt text](http://i.imgur.com/nzs4wl5.png "User interface")
 The application has rudimentary logging built-in, which reports files where errors were encountered when trying to parse data.
 
